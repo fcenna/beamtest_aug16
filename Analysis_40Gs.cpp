@@ -48,7 +48,7 @@ int main()
     }
 
 
-  // read the active numnber of channels
+  // read the active number of channels
   int ntmp;
   int np_Max = 10000;
   TRandom *xi = new TRandom();
