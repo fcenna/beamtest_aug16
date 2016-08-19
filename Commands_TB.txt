@@ -1,0 +1,65 @@
+For run 2
+========
+
+TCut Run2C0 = "t_max[0]>15 && t_max[0]<26 && ampl[0]>50 && ampl[0]<350 && t_frac50[0]>15 && t_frac50[0]<26 && t_zero[0]>18 && t_zero[0]<25 "
+TCut Run2C1 = " t_max[1]>12 && t_max[1]<19 &&  t_zero[1]>12 && t_max[1]<18"
+
+
+For run 4-7 
+========
+
+TCut Run7C0 = "t_max[0]>24 && t_max[0]<26 && ampl[0]>50 && ampl[0]<400 && t_frac50[0]>23 && t_frac50[0]<25 && t_zero[0]>23 && t_zero[0]<25 "
+TCut Run7C1 = "ampl[1]>180 && ampl[1]<700 && t_max[1]>16 && t_max[1]<20"
+TCut Run7C2 = "t_max[2]>20 && time_max[2]<30 && ampl[2]>300 && t_frac50[2]>24"
+
+
+TProfile *Amp1 = new TProfile("Amp1","Ch1", 50, 0.,400.,"");
+TProfile *Amp0 = new TProfile("Amp0","Ch0", 50, 0.,200.,"");
+
+Analysis->Draw("t_zero[0]-t_zero[1]",Run7C0 &&  Run7C1)
+
+Run8
+====
+very large time rms, 250 ps ??? why???
+TCut Run8C0 = "ampl[0]<180 && ampl[0]>80 && ampl[1]<400"
+
+
+
+TBrowser W
+
+
+TCut Sinc = "fabs(time_max[1]-time_max[0]+6)<2 && fabs(time_max[1]-time_max[2]+8.5)<2 && time_const50[0]>23 && time_const50[0]<26 && time_const50[0]-time_const50[1]>5"
+
+TCut Sinc = "fabs(time_max[1]-time_max[0]+6)<2 && fabs(time_max[1]-time_max[2]+8.5)<2 && time_const50[0]>23 && time_const50[0]<26 && time_const50[0]-time_const50[1]>5"
+
+TCut AllC = C0 && C1 && C2 && Sinc
+
+
+
+
+
+Run 12: Fixed Vth plus ToT correction
+===================
+900 e' la sincronia giusta (provato 901 e 910 con risultati peggiori)
+
+TCut Run12C0 = "  t_frac30[0]<20 && t_frac30[0]>15 && t_level30[0]<19 && t_level30[0]>18 && t_level20[0]<19.5 && t_level20[0]>18 &&  ampl[0]>45 && ampl[0]<300 && t_zero[0]>10 && t_zero[0]<20"
+TCut Run12C1 = "  ampl[1]<600 && t_level20[1]>14 && t_level20[1]<16"
+
+TCut Run12C0 = "  t_frac30[0]<20 && t_frac30[0]>15 && t_level30[0]<19 && t_level30[0]>18 && t_level20[0]<19.5 && t_level20[0]>18 &&  ampl[0]>45 && ampl[0]<300 && t_zero[0]>10 && t_zero[0]<20"
+TCut Run12C1 = "  ampl[1]<600 && t_level20[1]>14 && t_level20[1]<16"
+
+TCut Run12C01 = " ampl[0]>45 && ampl[0]<300 && ampl[1]>150 && ampl[1]<350 && t_level30[0]>18 && t_level30[0]<20 && t_level30[0]-trail_t_level20[0]<-3."
+
+
+
+SiPM@30% and W3@(30mV+correction)
+========================
+Analysis->Draw("t_frac30[1]+3.54977-0.00801175*ampl[0]+2.17392e-05*ampl[0]*ampl[0]-t_level30[0]", Run12C1 && Run12C0 && "t_frac30[0]<20 && t_frac30[0]>15")
+
+20 mV Vth
+=================
+Analysis->Draw("time_dis20[0]-time_dis20[1]-0.2957-0.000703*ampl[1]-3.18+0.00947329*ampl[0]-4.65645e-05*ampl[0]*ampl[0]+7.99914e-08*ampl[0]*ampl[0]*ampl[0]" , C00 && C1 && Run12C0 )
+
+time_zero
+=======
+Analysis->Draw("-0.0446338+0.000171476*ampl[1]-2.222-0.00463217*ampl[0]+2.12747e-05*ampl[0]*ampl[0]+time_zero[0]-time_const50[1]",C00 && C1 && Run12C0 && "time_zero[0]<20 && time_zero[0]>16 && ampl[1]<300" )
