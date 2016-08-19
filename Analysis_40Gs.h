@@ -53,7 +53,6 @@ Double_t area[NCHRO];
 Double_t dVdt1030[NCHRO];
 Double_t dVdt3070[NCHRO];
 Double_t dVdt2080[NCHRO];
-Double_t dVdt1090[NCHRO];
 
   Double_t totcha[NCHRO];
   Double_t maxS[NCHRO];
@@ -106,8 +105,6 @@ Double_t eff_dis100[NCHRO];
   Double_t t_level200[NCHRO];
   Double_t t_level300[NCHRO];
 
-  Double_t t_corr50[NCHRO];
-
   Double_t trail_t_level4[NCHRO];
   Double_t trail_t_level5[NCHRO];
   Double_t trail_t_level10[NCHRO];
@@ -125,7 +122,9 @@ Double_t eff_dis100[NCHRO];
   Double_t t_frac20[NCHRO];
   Double_t t_frac25[NCHRO];
   Double_t t_frac30[NCHRO];
+  Double_t t_frac40[NCHRO];
   Double_t t_frac50[NCHRO];
+  Double_t t_frac60[NCHRO];
   Double_t t_frac70[NCHRO];
   Double_t t_frac80[NCHRO];
   Double_t t_frac90[NCHRO];
@@ -246,39 +245,38 @@ float intBitsToFloat(const int x)
 
 //Compute average amplitude for background
 //(record lenght, amplitude vector, time vector, upper limit for background, upper limit for pulse, average background amplitude, max background amplitude)
-void Background(Int_t camp, Double_t amp[], Double_t timeS[],Double_t t0, Double_t t_bck, Double_t *bck, Double_t *maxbck, Double_t *rmsbck)
+void Background(Double_t amp[],Int_t Nt0, Int_t Nt1, Double_t *bck, Double_t *maxbck, Double_t *rmsbck)
 {
+
+  //  double min=1000000;
   double max=-1000000;
   float sumamp=0;
   float sumampsq=0;
   int pointsavg=0;
   float meanbck;
 
+  // TH1D hlite("hlite","hlite",camp,min,max);
   *bck=0;
-  for(int j=0;j<camp;j++)
+  for(int j=Nt0;j<Nt1;j++)
     {
-      if((timeS[j]>t0 && timeS[j]<t_bck))
-	{
-	  pointsavg++;
-	  sumamp=sumamp+amp[j];
-	  sumampsq=sumampsq+amp[j]*amp[j];
-	}
-      meanbck=sumamp/float(pointsavg);
-      *rmsbck=sqrt((1./float(pointsavg))*(sumampsq-float(pointsavg)*meanbck*meanbck));
+      pointsavg++;
+      sumamp=sumamp+amp[j];
+      sumampsq=sumampsq+amp[j]*amp[j];
     }
-
+  meanbck=sumamp/float(pointsavg);
+  *rmsbck=sqrt((1./float(pointsavg))*(sumampsq-float(pointsavg)*meanbck*meanbck));
+  
+  //*bck=hlite.GetBinCenter(hlite.GetMaximumBin());
   *bck=meanbck;
-  for(int j=0;j<camp;j++)
+
+  for(int j=Nt0;j<Nt1;j++)
     {
-      if((timeS[j]>t0 && timeS[j]<t_bck))
-	{
-	  if(std::fabs(amp[j]-meanbck)>max)
-	    max=amp[j];
-	}
+      if(std::fabs(amp[j]-meanbck)>max)
+	max=amp[j];
     }
 
   *maxbck=max;
-  //hlite.Reset();
+
   return;
 }
 
@@ -503,19 +501,18 @@ void Calibration_ip(Double_t cal_A0,Double_t cal_x0,Double_t cal_B0,Double_t max
 
 // Integrates the pulse to give charge - readout impedance must be known
 //(record lenght, amplitude vector, time vector, upper limit for background, upper limit for pulse, average background amplitude, pulse charge, total charge, readout resistance)
-void Charges(Int_t camp, Double_t amp[], Double_t timeS[], Double_t bck, Double_t t_bck, Double_t t_pul, Double_t *area, Double_t *charge, double R)
+void Charges(Double_t amp[], Double_t Dt, Int_t t_start, Int_t t_stop, Double_t *area, Double_t *charge, double R)
 {
   double tempminch=0;
-  //  double tempmaxch=0;
-  // double tempmintotch=0;
-  // double tempmaxtotch=0;
-  for(int j=0;j<camp-1;j++)
+  //  std::cout << "start - stop " << t_start << " - " << t_stop << std::endl;
+  
+  for(int j=t_start;j<t_stop;j++)
     {
-      if(timeS[j]>t_bck && timeS[j]<t_pul)	
-	  tempminch += (amp[j+1]+amp[j])/2-bck;
+      //  std::cout << " j = " << j <<   " total= " <<  tempminch <<  " amp " << amp[j] << std::endl;
+      tempminch += amp[j];
     }
-      *charge=tempminch*(timeS[1]-timeS[0])/R;
-      *area=tempminch*(timeS[1]-timeS[0]);
+      *charge=tempminch*Dt/R;
+      *area=tempminch*Dt;
   return;
 }
 
@@ -685,30 +682,47 @@ void Zerofittime(Int_t camp, Double_t amp[], Double_t timeS[], Double_t t_bck, D
 }
 
 // Time at which a fixed threshold is passed (descending)
+//
 void Trailtime(Int_t camp, Double_t amp[], Double_t timeS[], Int_t NMax, Double_t bck,Double_t threshold, Double_t *thrtime)
 {
+  //  std::cout << "NMAX = " << NMax << std::endl;
   TGraph *g = new TGraph();
   int npoints=20;
   g->Set(npoints);	      
   *thrtime=0;
-
+  //  float Der = 0;
   for(int j=NMax;j<camp;j++)
     {
+     
+      //  std::cout << "sample = " << j << " " << (amp[j]-bck) << " " << threshold << " time = " << timeS[j] << std::endl;
       if((amp[j]-bck-threshold)<0 && (amp[j-1]-bck-threshold)>0 &&  threshold>0)
 	{
+	  //	      *thrtime=(timeS[j]+timeS[j-1])/2.;
+	  //	      Der = fabs(  (threshold - (amp[j-1]-bck))/((amp[j]-amp[j-1])));
+	  //std::cout << "Der = " << Der << std::endl;
+	  //*thrtime=timeS[j-1]+Der*fabs(timeS[j]-timeS[j-1]);
+	      //	       std::cout << "th1 = " << timeS[j] << std::endl;
 	  for ( int kk = 0;kk<npoints;kk++)
 	    {
 	      g->SetPoint(kk,timeS[j-npoints/2+kk],amp[j-npoints/2+kk]-bck);
+	      //	  g->SetPoint(kk,amp[j-npoints/2+kk]-bck,timeS[j-npoints/2+kk]);
+	      //	  std::cout << kk << " " <<  timeS[j-npoints/2+kk] << " " << amp[j-npoints/2+kk]-bck << std::endl;
 	    }
 	  
 	  break;
 	  
 	}
+      //	  if((amp[j]-bck-threshold)<0 && threshold<0)
+      // {
+      //   *thrtime=(timeS[j]+timeS[j-1])/2.;
+	  //   break;
+	  // }
     }
     
   TF1 *lin = new TF1("lin","[0]+[1]*x");
   g->Fit("lin","QN","goff");
-
+  //  g->Fit("lin");
+  //    Der= lin->GetParameter(1);
   if (lin->GetParameter(1)<0)
     *thrtime=(threshold - lin->GetParameter(0))/lin->GetParameter(1);
   else
@@ -716,7 +730,6 @@ void Trailtime(Int_t camp, Double_t amp[], Double_t timeS[], Int_t NMax, Double_
   //  std::cout << "th1bis = " << *thrtime << std::endl;
   return;
 }
-
 // Time at which a fixed threshold is passed (going to the maximum)
 // The search starts from the maximum and goes backwards
 void Thrtime( Double_t amp[], Double_t timeS[], Int_t NMax, Double_t bck,Double_t threshold, Double_t *thrtime)

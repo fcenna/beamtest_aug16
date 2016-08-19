@@ -115,7 +115,6 @@ int main()
   OutTree->Branch("dVdt3070",dVdt3070,"dVdt3070[nchro]/D");
   OutTree->Branch("dVdt1030",dVdt1030,"dVdt1030[nchro]/D");
   OutTree->Branch("dVdt2080",dVdt2080,"dVdt2080[nchro]/D");
-  OutTree->Branch("dVdt1090",dVdt1090,"dVdt1090[nchro]/D");
   OutTree->Branch("strip",strip,"strip[nchro]/I");
   OutTree->Branch("bck",bck,"bck[nchro]/D");
   OutTree->Branch("max_bck",max_bck,"max_bck[nchro]/D");
@@ -137,12 +136,12 @@ int main()
   OutTree->Branch("t_level200",t_level200,"t_level200[nchro]/D");
   OutTree->Branch("t_level300",t_level300,"t_level300[nchro]/D");
 
-  OutTree->Branch("t_corr50",t_corr50,"t_corr50[nchro]/D");
-
   OutTree->Branch("trail_t_level10",trail_t_level10,"trail_t_level10[nchro]/D");
   OutTree->Branch("trail_t_level20",trail_t_level20,"trail_t_level20[nchro]/D");
   OutTree->Branch("trail_t_level30",trail_t_level30,"trail_t_level30[nchro]/D");
   OutTree->Branch("trail_t_level40",trail_t_level40,"trail_t_level40[nchro]/D");
+  OutTree->Branch("trail_t_level80",trail_t_level80,"trail_t_level800[nchro]/D");
+  OutTree->Branch("trail_t_level100",trail_t_level100,"trail_t_level100[nchro]/D");
 
   OutTree->Branch("t_frac05",t_frac05,"t_frac05[nchro]/D");
   OutTree->Branch("t_frac10",t_frac10,"t_frac10[nchro]/D");
@@ -150,7 +149,9 @@ int main()
   OutTree->Branch("t_frac20",t_frac20,"t_frac20[nchro]/D");
   OutTree->Branch("t_frac25",t_frac25,"t_frac25[nchro]/D");
   OutTree->Branch("t_frac30",t_frac30,"t_frac30[nchro]/D");
+  OutTree->Branch("t_frac40",t_frac40,"t_frac40[nchro]/D");
   OutTree->Branch("t_frac50",t_frac50,"t_frac50[nchro]/D");
+  OutTree->Branch("t_frac60",t_frac60,"t_frac60[nchro]/D");
   OutTree->Branch("t_frac70",t_frac70,"t_frac70[nchro]/D");
   OutTree->Branch("t_frac80",t_frac80,"t_frac80[nchro]/D");
   OutTree->Branch("t_frac90",t_frac90,"t_frac90[nchro]/D");
@@ -264,9 +265,7 @@ int main()
   float TauFall = 5.1/2.2;
   float TauRise = 0.5/2.2;
   //  cout << TauRise << " TFall = " << TauFall << endl; 
-
-  //  int event=0; [VS!!!]
-  event=0;
+  event = 0;
   //Loop on different runs
   while(1)
     {
@@ -358,7 +357,7 @@ int main()
 	  //   Run11f.ls();
       // cout << "Bin Content = " << BkgHist->GetBinContent(2) << endl;
       //Loop on different triggers of the run
-      cout << endl << "Event number: " << endl;
+      //      cout << endl << "Event number: " << endl;
       emptycount=0;
       while(running)  //running is set on 1 as long as all the channels have data for a trigger event
 	{
@@ -438,7 +437,7 @@ int main()
 	      nprec=0;
 	    	      
 	      std::string token;
-	      if (ntmp>0) // LECROY FORMAT
+	      if (!FWF2) // LECROY FORMAT
 		{
 		  getline (data,mystr); //cout << mystr << endl;
 		  getline (data,mystr);//  cout << mystr << endl;
@@ -496,7 +495,7 @@ int main()
 		    break;
 		  
 		  
-		  if (ntmp>0) // LECROY
+		  if (!FWF2) // LECROY
 		    {
 		      getline (data,mystr); 
 		      istringstream iss(mystr);		   
@@ -511,8 +510,8 @@ int main()
 		      if (i == 0 ) data >>  timeS[np] >> Itot[i][np] >> pip>> pip>> pip>> pip>> amp[i][np] >>pip >> pip;
 		      if (i == 1 ) data >>  timeS[np] >> Itot[i][np] >> pip>> pip>> pip>> pip>> pip >>  amp[i][np] >> pip;
 		      timeS[np] *=1.e-9;
-		      if (i == 0 && np< NbinBkg-NoiseBase) amp[i][np] += BkgHist->GetBinContent(NoiseBase+np)*1.e-3;
-		      if (i == 1 && np< NbinBkgCSA-NoiseBase) amp[i][np] += BkgHistCSA->GetBinContent(NoiseBase+np)*1.e-3;
+		      //  if (i == 0 && np< NbinBkg-NoiseBase) amp[i][np] += BkgHist->GetBinContent(NoiseBase+np)*1.e-3;
+		      // if (i == 1 && np< NbinBkgCSA-NoiseBase) amp[i][np] += BkgHistCSA->GetBinContent(NoiseBase+np)*1.e-3;
 
 		    }
 		  
@@ -522,7 +521,7 @@ int main()
 		      time0temp=timeS[np];   //Sets first sample time to zero
 		    }
 		  timeS[np]=(timeS[np]-time0temp)*1.e9; // time in ns
-		  amp[i][np]=amp[i][np]*1.e3; // ampl. in mV
+		  if (!FWF2) amp[i][np]=amp[i][np]*1.e3; // ampl. in mV
 		  DT = (timeS[10]-timeS[9]); // delta T in nanosecond
 		  //	  cout << DT << endl;
 		  if (fabs(amp[i][np])>AMax[i]) 
@@ -550,7 +549,7 @@ int main()
 		}
 	      if (event <20  ) cout << "Event: " << event << " channel " << i << " has maximum value of " << AMax[i] << " [mV] at  " <<  TMax[i] << " [ns] " << " on sample " << NMax[i] << " polarity = " << polarity[i] << endl;
 	
-	      if (ntmp > 0)
+	      if (!FWF2)
 		{
 		  t_bck[i] = (TMax[i]-20>0) ? TMax[i]-20 : 7 ;
 		  t_pul[i] = (TMax[i]+30 < timeS[np-2]) ? TMax[i]+30 : timeS[np-2] ;
@@ -626,6 +625,7 @@ int main()
 	      // compute the derivative on the signal shape
 	      Derivative( DT, camp[i],&m_amprec[i][0],&der_amp[i][0]);
 	      
+
 	
 	      //	      continue;	      	      
 	      //Place your single channel analysis here!
@@ -633,12 +633,18 @@ int main()
 	      // for(int j=0;j<camp[i];j++) amp[i][j]=polarity[i]*m_amp[i][j];
 	      //  cout << "t_bck[" <<i <<"] = "<< t_bck[i] << endl;
  
-	      
-	      //calculate the baseline rms and amplitude after the signal, the last 15 ns	     
-	      Background(camp[i],&m_amprec[i][0],timeS,t_bck[camp[i]]-15,t_bck[camp[i]],&bck[i],&max_fwd_bck[i],&rms_fwd_bck[i]);
 
-	      //calculate the baseline rms and amplitude before the signal and define the bck level
-	      Background(camp[i],&m_amprec[i][0],timeS,t_bck[i]-5,t_bck[i],&bck[i],&max_bck[i],&rms_bck[i]);
+
+	      
+	      //calculate the baseline rms and amplitude after the signal, the from 10 to 15 ns after the max
+
+	     
+	      Background(&m_amprec[i][0], NMax[i]+10./DT,NMax[i]+15./DT,&bck[i],&max_fwd_bck[i],&rms_fwd_bck[i]);
+
+	      //calculate the baseline rms and amplitude before the signal, from -10 to -5 ns before the signal
+
+	      //	      Background(&m_amprec[i][0], NMax[i]-10./DT, NMax[i]-5./DT,&bck[i],&max_bck[i],&rms_bck[i]);
+	      Background(&m_amprec[i][0], 0./DT, 5./DT,&bck[i],&max_bck[i],&rms_bck[i]);
 
 	      if (ntmp<0)
 		{
@@ -653,9 +659,9 @@ int main()
 	      Amplitudes(camp[i],&m_amprec[i][0],timeS,bck[i],t_bck[i],t_pul[i],&ampl[i],&t_max[i],&ampl_chi2[i]);	      
 
 	      // std::cout << bck[i] << " Ch = " << i << " Ampl: " << ampl[i] << std::endl;
-
-	      Charges(camp[i],&m_amprec[i][0],timeS,bck[i],t_bck[i],t_pul[i],&area[i],&totcha[i],50);
-	      //  cout << "charge = " << area[i] << " totcha = " << totcha[i] << " amp = " << ampl[i] << " ratio Q/A = " << area[i]/ampl[i] <<endl;
+	      
+	      Charges(&m_amprec[i][0],DT,NMax[i]-5./DT, NMax[i]+5./DT,&area[i],&totcha[i],50);
+	      //  cout << "area = " << area[i] << " amp = " << ampl[i] << " ratio Q/A = " << area[i]/ampl[i] <<endl;
 
 	      // Amplitudes_NF(camp[i],&m_amprec[i][0],timeS,bck[i],t_bck[i],t_pul[i],&ampl[i],&t_max[i]);
 
@@ -666,35 +672,35 @@ int main()
 	      Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],5.*rms_bck[i],&t_rms5[i]);		      
 
 
-	      Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],10.,&t_level10[i]);
-	      Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],20.,&t_level20[i]);
-	      Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],30.,&t_level30[i]);
-	      Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],40.,&t_level40[i]);
-	      Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],50.,&t_level50[i]);
-	      Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],60.,&t_level60[i]);		      
+	      if (ampl[i]>10) Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],10.,&t_level10[i]);
+	      if (ampl[i]>20) Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],20.,&t_level20[i]);
+	      if (ampl[i]>30) Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],30.,&t_level30[i]);
+	      if (ampl[i]>40) Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],40.,&t_level40[i]);
+	      if (ampl[i]>50) Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],50.,&t_level50[i]);
+	      if (ampl[i]>60) Thrtime(&m_amprec[i][0],timeS,NMax[i],bck[i],60.,&t_level60[i]);		      
 
-	      Trailtime(camp[i],&m_amprec[i][0],timeS,NMax[i],bck[i],10.,&trail_t_level10[i]);
-	      Trailtime(camp[i],&m_amprec[i][0],timeS,NMax[i],bck[i],20.,&trail_t_level20[i]);
-	      Trailtime(camp[i],&m_amprec[i][0],timeS,NMax[i],bck[i],30.5,&trail_t_level30[i]);
-	      Trailtime(camp[i],&m_amprec[i][0],timeS,NMax[i],bck[i],40.,&trail_t_level40[i]);
+	      if (ampl[i]>10) Trailtime(camp[i],&m_amprec[i][0],timeS,NMax[i],bck[i],10.,&trail_t_level10[i]);
+	      if (ampl[i]>20) Trailtime(camp[i],&m_amprec[i][0],timeS,NMax[i],bck[i],20.,&trail_t_level20[i]);
+	      if (ampl[i]>30) Trailtime(camp[i],&m_amprec[i][0],timeS,NMax[i],bck[i],30.5,&trail_t_level30[i]);
+	      if (ampl[i]>40) Trailtime(camp[i],&m_amprec[i][0],timeS,NMax[i],bck[i],40.,&trail_t_level40[i]);
+	      if (ampl[i]>80) Trailtime(camp[i],&m_amprec[i][0],timeS,NMax[i],bck[i],80.,&trail_t_level80[i]);
+	      if (ampl[i]>100) Trailtime(camp[i],&m_amprec[i][0],timeS,NMax[i],bck[i],100.,&trail_t_level100[i]);
 
+	
+	      
 	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.05,ampl[i],NMax[i],&t_frac05[i]);
 	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.1,ampl[i],NMax[i],&t_frac10[i]);
 	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.15,ampl[i],NMax[i],&t_frac15[i]);
 	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.2,ampl[i],NMax[i],&t_frac20[i]);
 	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.25,ampl[i],NMax[i],&t_frac25[i]);
 	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.3,ampl[i],NMax[i],&t_frac30[i]);
+	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.4,ampl[i],NMax[i],&t_frac40[i]);
 	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.5,ampl[i],NMax[i],&t_frac50[i]);
+	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.6,ampl[i],NMax[i],&t_frac60[i]);
 	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.7,ampl[i],NMax[i],&t_frac70[i]);
 	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.8,ampl[i],NMax[i],&t_frac80[i]);
 	      ConstFractime(&m_amprec[i][0],timeS,bck[i],0.9,ampl[i],NMax[i],&t_frac90[i]);
 	      //	      std::cout << "i = " << i << " t_max = " << t_max[i] << "  t@ 30% " << t_frac30[i] << " 50% " << t_frac50[i] << std::endl;
-	      
-	      //correction for t_frac50 [VS]
-	      t_corr50[i] = 18.352
-		          + 0.013163    * ampl[i]
-		          - 6.06774e-05 * ampl[i]*ampl[i]
-		          + 1.01698e-07 * ampl[i]*ampl[i]*ampl[i];	      
 	      
 	      TrailConstFractime(camp[i],&m_amprec[i][0],timeS,bck[i],0.3,ampl[i],NMax[i],&trail_t_frac30[i]);
 	      TrailConstFractime(camp[i],&m_amprec[i][0],timeS,bck[i],0.5,ampl[i],NMax[i],&trail_t_frac50[i]);
@@ -716,9 +722,6 @@ int main()
 	
 		  if  ((t_frac80[i]- t_frac20[i]) != 0)
 		    dVdt2080[i] =( m_amprec[i][ int (t_frac80[i]/DT)]- m_amprec[i][int (t_frac20[i]/DT)])/(t_frac80[i]- t_frac20[i]);
-
-		  if  ((t_frac90[i]- t_frac10[i]) != 0)
-		    dVdt1090[i] =( m_amprec[i][ int (t_frac90[i]/DT)]- m_amprec[i][int (t_frac10[i]/DT)])/(t_frac90[i]- t_frac10[i]);
 		}
 	      // cout << dVdt3070[i] << endl;
 	      
