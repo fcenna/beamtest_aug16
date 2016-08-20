@@ -306,8 +306,8 @@ void Amplitudes(Int_t camp, Double_t amp[], Double_t timeS[],  Double_t bck, Dou
   float AmpFrac = 0.8;
   // double tempmean;
   // double tempsig;
-  double_t   max=-100000;
-  double_t   tmax=-100000;
+  Double_t   max=-100000;
+  Double_t   tmax=-100000;
 
   //Maximum calculation
   for(int j=0;j<camp-1;j++)
@@ -1034,8 +1034,8 @@ void riselinfit(Int_t camp, Double_t amp[], Double_t timeS[],Double_t bck,Double
   int npoints=0;
   int nnpoints=0;
   int Nlow=0;
-  double_t amp_low =0;
-  double_t amp_high =0;
+  Double_t amp_low =0;
+  Double_t amp_high =0;
   //  t_low = t_high-0.2;
   // std::cout << " t low " << t_low << " t_high " << t_high << std::endl;
   for(int i=0;i<camp;i++)
@@ -1105,7 +1105,7 @@ void mobileAVG(Int_t camp, Double_t amp[], Int_t navg, Double_t m_amp[])
   return;
 }
 
-void CSA( Double_t TimeUnit, Double_t TransImp, Double_t TauRC, Double_t TauFall, double_t TauRise, Int_t camp, Double_t Itot[],Double_t CSAout[])
+void CSA( Double_t TimeUnit, Double_t TransImp, Double_t TauRC, Double_t TauFall, Double_t TauRise, Int_t camp, Double_t Itot[],Double_t CSAout[])
 {
 
   int IMaxSh = 60./TimeUnit; //TimeUnit in [ns]
