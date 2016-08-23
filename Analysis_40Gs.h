@@ -306,8 +306,8 @@ void Amplitudes(Int_t camp, Double_t amp[], Double_t timeS[],  Double_t bck, Dou
   float AmpFrac = 0.8;
   // double tempmean;
   // double tempsig;
-  Double_t   max=-100000;
-  Double_t   tmax=-100000;
+  double_t   max=-100000;
+  double_t   tmax=-100000;
 
   //Maximum calculation
   for(int j=0;j<camp-1;j++)
@@ -354,22 +354,25 @@ void Amplitudes(Int_t camp, Double_t amp[], Double_t timeS[],  Double_t bck, Dou
   double temp1;
   double temp2;
   TF1 *f1 = new TF1("gausfit","[0]*exp(-(x-[1])*(x-[1])/(2*[2]*[2]))",timeS[j_start-1],timeS[j_start+n_j+1]);
-  TGraph g(n_j);
+  // TGraph g(n_j);
+  TGraph *g = new TGraph();
+  g->Set(n_j);
   for(int j=0;j<n_j;j++)
     {
-      g.SetPoint(j,timeS[j+j_start],amp[j+j_start]-bck);
+      g->SetPoint(j,timeS[j+j_start],amp[j+j_start]-bck);
     }
 
   temp0=max;
   temp1=tmax;
   temp2=(timeS[j_start]-timeS[j_start+n_j])/2.;
   f1->SetParameters(temp0,temp1,temp2);
-  g.Fit("gausfit","QN","",timeS[j_start]-1,timeS[j_start+n_j-1]+1);
+  g->Fit("gausfit","QN","",timeS[j_start]-1,timeS[j_start+n_j-1]+1);
   //  g.Fit("gausfit","QN","",timeS[j_start]-1,timeS[j_start+n_j-1]+1);
   *pamp=f1->GetParameter(0);
   *tamp=f1->GetParameter(1);
 
   *chi=f1->GetChisquare()/f1->GetNDF();
+  g->Delete();
   f1->Delete();
 
   return;
@@ -594,6 +597,8 @@ void Thrtime_old(Int_t camp, Double_t amp[], Double_t timeS[], Double_t t_bck, D
   else
     *thrtime = 0;
   // std::cout << "th1bis = " << *thrtime << std::endl;
+  g->Delete();
+  lin->Delete();
   return;
 }
 
@@ -728,6 +733,8 @@ void Trailtime(Int_t camp, Double_t amp[], Double_t timeS[], Int_t NMax, Double_
   else
     *thrtime = 0;
   //  std::cout << "th1bis = " << *thrtime << std::endl;
+  g->Delete();
+  lin->Delete();
   return;
 }
 // Time at which a fixed threshold is passed (going to the maximum)
@@ -777,6 +784,8 @@ void Thrtime( Double_t amp[], Double_t timeS[], Int_t NMax, Double_t bck,Double_
     //else
     // *thrtime = 0;
     //    std::cout << "th1bis = " << *thrtime << std::endl;
+    g->Delete();
+    lin->Delete();
   return;
 }
 
@@ -786,23 +795,7 @@ void Thrtime( Double_t amp[], Double_t timeS[], Int_t NMax, Double_t bck,Double_
 void TrailConstFractime(Int_t camp, Double_t amp[], Double_t timeS[],Double_t bck,Double_t threshold, Double_t max, Int_t NMax,Double_t *trailtime)
 {
   *trailtime=0;
-  /*
-  for(int j=NMax;j<camp;j++)
-    {
-      
-      if(((amp[j]-bck)/max-threshold)<0 && threshold>0)
-	{
-	  *trailtime=(timeS[j]+timeS[j-1])/2.;
-	  break;
-	}
-      if(((amp[j]-bck)/max-threshold)>0 && threshold<0)
-	{
-	  *trailtime=(timeS[j]+timeS[j-1])/2.;
-	  break;
-	}
-      
-    }
-*/
+
   TGraph *g = new TGraph();
   int npoints=20;
   g->Set(npoints);	      
@@ -1034,8 +1027,8 @@ void riselinfit(Int_t camp, Double_t amp[], Double_t timeS[],Double_t bck,Double
   int npoints=0;
   int nnpoints=0;
   int Nlow=0;
-  Double_t amp_low =0;
-  Double_t amp_high =0;
+  double_t amp_low =0;
+  double_t amp_high =0;
   //  t_low = t_high-0.2;
   // std::cout << " t low " << t_low << " t_high " << t_high << std::endl;
   for(int i=0;i<camp;i++)
@@ -1105,7 +1098,7 @@ void mobileAVG(Int_t camp, Double_t amp[], Int_t navg, Double_t m_amp[])
   return;
 }
 
-void CSA( Double_t TimeUnit, Double_t TransImp, Double_t TauRC, Double_t TauFall, Double_t TauRise, Int_t camp, Double_t Itot[],Double_t CSAout[])
+void CSA( Double_t TimeUnit, Double_t TransImp, Double_t TauRC, Double_t TauFall, double_t TauRise, Int_t camp, Double_t Itot[],Double_t CSAout[])
 {
 
   int IMaxSh = 60./TimeUnit; //TimeUnit in [ns]
