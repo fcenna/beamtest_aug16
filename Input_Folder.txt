@@ -3,13 +3,13 @@ Run 1
 StartingTrig 00001
 Nchannel 4
 MaxEvent -1
-file /home/rob/Documents/UniTO/00_Tesi/Beam_Test_Aug2016/DATA_BeamTestAug2016/C1_190V_C2_190V_C3_190V_C4_28V_I/C1data
+file /home/rob/Documents/UniTO/00_Tesi/Beam_Test_Aug2016/DATA_BeamTestAug2016/C1_150V_C2_150V_C3_150V_C4_28V_II/C1data
 nmedia 1
-file /home/rob/Documents/UniTO/00_Tesi/Beam_Test_Aug2016/DATA_BeamTestAug2016/C1_190V_C2_190V_C3_190V_C4_28V_I/C2data
+file /home/rob/Documents/UniTO/00_Tesi/Beam_Test_Aug2016/DATA_BeamTestAug2016/C1_150V_C2_150V_C3_150V_C4_28V_II/C2data
 nmedia 1
-file /home/rob/Documents/UniTO/00_Tesi/Beam_Test_Aug2016/DATA_BeamTestAug2016/C1_190V_C2_190V_C3_190V_C4_28V_I/C3data
+file /home/rob/Documents/UniTO/00_Tesi/Beam_Test_Aug2016/DATA_BeamTestAug2016/C1_150V_C2_150V_C3_150V_C4_28V_II/C3data
 nmedia 1
-file /home/rob/Documents/UniTO/00_Tesi/Beam_Test_Aug2016/DATA_BeamTestAug2016/C1_190V_C2_190V_C3_190V_C4_28V_I/C4data
+file /home/rob/Documents/UniTO/00_Tesi/Beam_Test_Aug2016/DATA_BeamTestAug2016/C1_150V_C2_150V_C3_150V_C4_28V_II/C4data
 nmedia 1
 
 Run -1 
