@@ -57,36 +57,45 @@ int completeROOT()
 	TCut C0_170V = ( "ampl[0]>200 && ampl[0]<950 && t_frac30[0]>=7 && t_frac30[0]<=10 ");
 	TCut C1_170V = ( "ampl[1]>200 && ampl[1]<950 && t_frac30[1]>=7 && t_frac30[1]<=10 ");
 
+	TCut C0_180V = ( "ampl[0]>300 && ampl[0]<1100 && t_frac30[0]>=7 && t_frac30[0]<=10 ");
+	TCut C1_180V = ( "ampl[1]>300 && ampl[1]<1100 && t_frac30[1]>=7 && t_frac30[1]<=10 ");
+
+	TCut C0_210V = ( "ampl[0]>400 && ampl[0]<1100 && t_frac30[0]>=7 && t_frac30[0]<=10 ");
+	TCut C1_210V = ( "ampl[1]>400 && ampl[1]<1100 && t_frac30[1]>=7 && t_frac30[1]<=10 ");
+
+	TCut C0_220V = ( "ampl[0]>260 && ampl[0]<800 && t_frac30[0]>=7 && t_frac30[0]<=10 ");
+	TCut C1_220V = ( "ampl[1]>260 && ampl[1]<800 && t_frac30[1]>=7 && t_frac30[1]<=10 ");
+
 //	TCanvas *c_CACCA = new TCanvas(" CACCA ",640,480);
 
+	t_complete->Draw("(2*ampl[0])>>h_ampl_C0", Run220V && C0_220V );
 
+//	t_complete->Draw("(ampl[0])>>h_ampl_C0", Run75V && C0_75V );
+	h_ampl_C0->Fit("landau"); //"fit_ampl_C0", 
+	Double_t MPVampl_C0 = landau->GetParameter(1); //Get most probable value of amplitude
+	Double_t eMPVampl_C0 = landau->GetParameter(2); //Get error of MPV as sigma of landau
 
-	t_complete->Draw("(ampl[0])>>h_ampl_C0_75V", Run170V && C0_170V );
-
-//	t_complete->Draw("(ampl[0])>>h_ampl_C0_75V", Run75V && C0_75V );
-	h_ampl_C0_75V->Fit("landau"); //"fit_ampl_C0_75V", 
-	Double_t MPVampl_C0_75V = landau->GetParameter(1); //Get most probable value of amplitude
-	Double_t eMPVampl_C0_75V = landau->GetParameter(2); //Get error of MPV as sigma of landau
-
-	t_complete->Draw("(area[0])>> h_area_C0_75V ", Run170V && C0_170V );
-	h_area_C0_75V->Fit("landau"); //"fit_area_C0_75V", 
-	Double_t  MPVarea_C0_75V = landau->GetParameter(1);  //Get most probable value of area
-	Double_t eMPVarea_C0_75V = landau->GetParameter(2);  //Get error of MPV as sigma of landau
+	t_complete->Draw("(2*area[0])>> h_area_C0 ", Run220V && C0_220V );
+	h_area_C0->Fit("landau"); //"fit_area_C0_75V", 
+	Double_t  MPVarea_C0 = landau->GetParameter(1);  //Get most probable value of area
+	Double_t eMPVarea_C0 = landau->GetParameter(2);  //Get error of MPV as sigma of landau
 	
 
-	t_complete->Draw("(t_frac30[1]-t_frac30[0])>>h_deltat30_75V", Run170V && C0_170V && C1_170V);
-	h_deltat30_75V->Fit("gaus"); //"fit_ampl_C0_75V", 
-	Double_t sigmat_75V = (1/sqrt(2))*gaus->GetParameter(2); //Get time resolution as the stddev of Gaussian distribution
+	t_complete->Draw("(t_frac30[1]-t_frac30[0])>>h_deltat30", Run220V && C0_220V && C1_220V);
+	h_deltat30->Fit("gaus"); //"fit_ampl_C0", 
+	Double_t sigmat = (1/sqrt(2))*gaus->GetParameter(2); //Get time resolution as the stddev of Gaussian distribution
 
-	cout << "MPVampl  [mV]= " << MPVampl_C0_75V  << endl;
-	cout << "eMPVampl [mV]= " << eMPVampl_C0_75V << endl;
-	cout << "MPVarea  [mV]= " << MPVarea_C0_75V  << endl;
-	cout << "eMPVarea [mV]= " << eMPVarea_C0_75V << endl;
-	cout << "sigma    [ns]= " << sigmat_75V      << endl;
+	cout << endl << "********* RESULTS ********"<< endl;
+	cout << " MPVampl  [mV]= " << MPVampl_C0  << endl;
+	cout << " eMPVampl [mV]= " << eMPVampl_C0 << endl;
+	cout << " MPVarea  [mV]= " << MPVarea_C0  << endl;
+	cout << " eMPVarea [mV]= " << eMPVarea_C0 << endl;
+	cout << " sigma    [ns]= " << sigmat      << endl;
+	cout << "**************************"<< endl;
 
 	landau->Delete();
 	gaus->Delete();
-
+	//c1->close();
 
 	t_complete->Delete();
 
