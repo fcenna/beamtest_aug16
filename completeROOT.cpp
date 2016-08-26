@@ -90,7 +90,7 @@ int completeROOT()
 	cout << " eMPVampl [mV]= " << eMPVampl_C0 << endl;
 	cout << " MPVarea  [mV]= " << MPVarea_C0  << endl;
 	cout << " eMPVarea [mV]= " << eMPVarea_C0 << endl;
-	cout << " sigma    [ns]= " << sigmat      << endl;
+	cout << " sigma    [ps]= " << 1000*sigmat      << endl;
 	cout << "**************************"<< endl;
 
 	landau->Delete();
